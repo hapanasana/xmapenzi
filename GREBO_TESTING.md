@@ -103,7 +103,8 @@ php test-grebo-webhook.php XMP20260531TEST001 "your_webhook_secret"
 ├─ User sees USSD prompt
 ├─ User enters PIN
 ├─ Grebo processes payment
-├─ Grebo calls webhook with: x-grebo-signature header
+├─ Grebo calls webhook with: X-Webhook-Signature + X-Webhook-Timestamp
+│  (signature = HMAC-SHA256(timestamp.rawBody))
 │
 │                              ├─ POST /api/grebo-webhook.php
 │                              ├─ Verify signature with grebo_webhook_secret
