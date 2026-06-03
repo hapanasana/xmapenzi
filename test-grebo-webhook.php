@@ -34,9 +34,10 @@ $payload = [
 ];
 
 $raw = json_encode($payload);
+$timestamp = gmdate('D, d M Y H:i:s T');
 
-// 2. Sign it
-$signature = hash_hmac('sha256', $raw, $secret);
+// 2. Sign it using Grebo's documented scheme: HMAC-SHA256(timestamp.rawBody)
+$signature = hash_hmac('sha256', $timestamp . '.' . $raw, $secret);
 
 echo "=== Grebo Webhook Test ===\n";
 echo "Reference: $reference\n";
@@ -71,7 +72,7 @@ try {
     $cfg = grebo_config();
     $cfg['webhook_secret'] = $secret;
     
-    if (!grebo_verify_signature($secret, $raw, $signature)) {
+    if (!grebo_verify_signature($secret, $raw, $signature, $timestamp)) {
         echo "[ERROR] Signature verification failed!\n";
         exit(1);
     }
