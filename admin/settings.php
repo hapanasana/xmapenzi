@@ -124,7 +124,7 @@ require __DIR__ . '/_layout.php';
 
 <div class="card">
   <h3 style="margin-top:0">Grebo Webhook Secret — Explained</h3>
-  <p class="muted">Grebo signs webhook requests na HMAC-SHA256. Secret ni:</p>
+  <p class="muted">Grebo signs webhook requests na HMAC-SHA256 over `timestamp.rawBody`. Secret ni:</p>
   <?php if ($cfg['grebo_webhook_secret']): ?>
     <p style="color:var(--gold);font-weight:bold">✓ Custom secret imesanidiwa</p>
   <?php else: ?>
@@ -145,7 +145,7 @@ require __DIR__ . '/_layout.php';
 
 <div class="card">
   <h3 style="margin-top:0">Webhook URL ya Grebo</h3>
-  <p class="muted">Set this in the Grebo dashboard as your deposit callback (Grebo signs requests with `x-grebo-signature`).</p>
+  <p class="muted">Set this in the Grebo dashboard as your deposit callback (Grebo signs requests with `X-Webhook-Signature` and `X-Webhook-Timestamp`).</p>
   <code style="display:block;padding:10px;background:var(--surface-2);border-radius:8px;word-break:break-all"><?= e($greboWebhookUrl) ?></code>
 </div>
 
