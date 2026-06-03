@@ -10,7 +10,7 @@
   - `grebo_verify_signature()` — webhook signature verification
   
 - **`api/grebo-webhook.php`** — Webhook endpoint for Grebo
-  - Verifies `x-grebo-signature` header
+  - Verifies `x-webhook-signature` + `x-webhook-timestamp` using `timestamp.rawBody`
   - Updates payment status when transaction completes/fails
   - Uses `selcom_*` columns for compatibility (no schema change needed)
 
@@ -133,7 +133,8 @@ Response (completed):
 ```
 POST /api/grebo-webhook.php
 Headers:
-  X-Grebo-Signature: <hmac-sha256>
+  X-Webhook-Signature: <hmac-sha256>
+  X-Webhook-Timestamp: <iso8601>
   Content-Type: application/json
 
 Body:
