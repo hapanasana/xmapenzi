@@ -44,10 +44,18 @@ function grebo_deposit(array $cfg, array $args): array {
     return grebo_http('POST', $cfg['base'] . '/api/v1/deposits', $cfg, $body);
 }
 
-function grebo_verify_signature(string $secret, string $rawBody, string $signature): bool {
+function grebo_verify_signature(string $secret, string $rawBody, string $signature, ?string $timestamp = null): bool {
     if ($secret === '') return false;
-    $expected = hash_hmac('sha256', $rawBody, $secret);
-    return hash_equals($expected, $signature);
+
+    $sig = trim($signature);
+    if (str_starts_with($sig, 'sha256=')) {
+        $sig = substr($sig, 7);
+    }
+
+    $message = $timestamp ? $timestamp . '.' . $rawBody : $rawBody;
+    $expected = hash_hmac('sha256', $message, $secret);
+
+    return hash_equals($expected, $sig);
 }
 
 function grebo_transaction_lookup(array $cfg, string $reference): array {
