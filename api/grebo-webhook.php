@@ -6,8 +6,10 @@ $cfg = grebo_config();
 $secret = $cfg['webhook_secret'] ?? '';
 
 $raw = file_get_contents('php://input');
-$sig = $_SERVER['HTTP_X_GREBO_SIGNATURE'] ?? '';
-if (!$secret || !$sig || !grebo_verify_signature($secret, $raw, $sig)) {
+$sig = $_SERVER['HTTP_X_WEBHOOK_SIGNATURE'] ?? $_SERVER['HTTP_X_GREBO_SIGNATURE'] ?? '';
+$timestamp = $_SERVER['HTTP_X_WEBHOOK_TIMESTAMP'] ?? '';
+
+if (!$secret || !$sig || !grebo_verify_signature($secret, $raw, $sig, $timestamp)) {
     http_response_code(401); die('Unauthorized');
 }
 
