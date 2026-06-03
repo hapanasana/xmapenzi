@@ -52,14 +52,18 @@ if ($provider === 'grebo') {
         'reference' => $reference,
         'callback_url' => $callback,
     ]);
-    $ok = ($res['status'] >= 200 && $res['status'] < 300) && isset($res['json']['id']);
+    $tx = $res['json']['data'] ?? $res['json'];
+    $txId = $tx['id'] ?? $res['json']['id'] ?? null;
+    $ok = ($res['status'] >= 200 && $res['status'] < 300)
+        && (($res['json']['status'] ?? '') === 'success' || !empty($txId));
+
     if (!$ok) {
         db()->prepare('UPDATE payments SET status="failed", selcom_message=? WHERE reference=?')
             ->execute([substr(json_encode($res['json']), 0, 250), $reference]);
         json_out(['error' => $res['json']['message'] ?? 'Imeshindikana kutuma ombi. Jaribu tena.'], 502);
     }
-    // store provider transaction id
-    db()->prepare('UPDATE payments SET selcom_reference=? WHERE reference=?')->execute([$res['json']['id'], $reference]);
+
+    db()->prepare('UPDATE payments SET selcom_reference=? WHERE reference=?')->execute([$txId, $reference]);
     json_out([
         'reference' => $reference,
         'message'   => $res['json']['message'] ?? 'Angalia simu yako, ingiza PIN kukamilisha malipo.',
