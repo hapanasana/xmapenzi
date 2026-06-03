@@ -35,8 +35,9 @@ PAYLOAD=$(cat <<EOF
 EOF
 )
 
-# Sign payload
-SIGNATURE=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" -hex | cut -d ' ' -f2)
+# Sign payload using Grebo's documented scheme: HMAC-SHA256("${timestamp}.${rawBody}")
+TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+SIGNATURE=$(printf '%s.%s' "$TIMESTAMP" "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" -hex | cut -d ' ' -f2)
 
 echo "=== Grebo Webhook Curl Test ==="
 echo "URL: $WEBHOOK_URL"
@@ -50,7 +51,8 @@ echo ""
 echo "Sending webhook..."
 curl -X POST "$WEBHOOK_URL" \
   -H "Content-Type: application/json" \
-  -H "X-Grebo-Signature: $SIGNATURE" \
+  -H "X-Webhook-Signature: $SIGNATURE" \
+  -H "X-Webhook-Timestamp: $TIMESTAMP" \
   -d "$PAYLOAD" \
   -v
 
